@@ -1,0 +1,40 @@
+/* Praxis Law Firm pack dashboard — the four compliance surfaces.
+   Navy/legal-blue theme (accent #1e3a8a). Matches the rail-section pattern. */
+
+#law-firm-section { display: block; }
+#law-firm-mount { display: flex; flex-direction: column; gap: 14px; }
+
+.lf-surface {
+  border: 1px solid var(--border, #1f2a3a);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--panel, #0f172a);
+}
+.lf-surface-title {
+  font-size: 11px; font-weight: 600; margin: 0 0 8px 0;
+  color: #93c5fd; text-transform: uppercase; letter-spacing: 1px;
+}
+.lf-surface-body { font-size: 12px; color: var(--text, #e6edf3); }
+
+.lf-empty { color: var(--muted, #7d8590); font-style: italic; }
+.lf-muted { color: var(--muted, #7d8590); }
+
+.lf-stat-line { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.lf-stat { font-weight: 600; }
+.lf-stat-ok { color: #22c55e; }
+.lf-stat-warn { color: #f59e0b; }
+.lf-stat-bad { color: #ef4444; }
+
+.lf-row { padding: 2px 0; color: var(--text, #e6edf3); }
+
+.lf-list { list-style: none; margin: 4px 0 0 0; padding: 0; }
+.lf-list li { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+.lf-badge {
+  display: inline-block; padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  margin-right: 6px;
+}
+.lf-badge-ok { background: rgba(34,197,94,0.18); color: #86efac; }
+.lf-badge-warn { background: rgba(245,158,11,0.18); color: #fcd34d; }
+.lf-badge-bad { background: rgba(239,68,68,0.18); color: #fca5a5; }
