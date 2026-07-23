@@ -5,7 +5,7 @@ Called once on import of :mod:`hybridagent_praxis_legal`. Registers:
   * the ``law_firm`` :class:`VerticalSpec` (persona keyword, compliance mode,
     autonomous/held risk classes),
   * a factory returning the 5 manual law-firm eval cases, and
-  * (future) the law-firm dashboard route registrar.
+  * the authenticated law-firm dashboard route registrar.
 
 The manual eval cases import the vertical-specific modules lazily (inside
 the factory's runnables), so simply installing this package does not
@@ -15,14 +15,18 @@ dashboard route actually executes.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import Any, TYPE_CHECKING
 
 from hybridagent.broker import RiskClass
 from hybridagent.evals import EvalCase
 from hybridagent.verticals.registry import (
     VerticalSpec,
     register_vertical_eval_cases,
+    register_vertical_pack_root,
+    register_vertical_routes,
     register_vertical_spec,
+    register_vertical_web_root,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -35,7 +39,7 @@ _LEGAL_PERSONA_SPEC = VerticalSpec(
     compliance_mode="enforced",
     autonomous={RiskClass.READ},
     held={RiskClass.SEND, RiskClass.DESTRUCTIVE},
-    version="0.1.0",
+    version="0.1.1",
 )
 
 _LEGAL_SPEC = VerticalSpec(
@@ -44,7 +48,7 @@ _LEGAL_SPEC = VerticalSpec(
     compliance_mode="enforced",
     autonomous={RiskClass.READ, RiskClass.DRAFT},
     held={RiskClass.SEND, RiskClass.DESTRUCTIVE},
-    version="0.1.0",
+    version="0.1.1",
 )
 
 
@@ -156,6 +160,16 @@ def _manual_cases() -> list[EvalCase]:
     ]
 
 
+def _handle_routes(handler: Any) -> bool:
+    path = str(handler.path).split("?", 1)[0]
+    if handler.command != "GET" or path != "/api/law_firm":
+        return False
+    if not handler._require_auth():
+        return True
+    handler._json_response(handler.daemon.law_firm_compliance())
+    return True
+
+
 def register() -> None:
     """Register the legal vertical with the Praxis base registry.
 
@@ -166,3 +180,6 @@ def register() -> None:
     register_vertical_spec(_LEGAL_PERSONA_SPEC)
     register_vertical_spec(_LEGAL_SPEC)
     register_vertical_eval_cases(_manual_cases)
+    register_vertical_routes(_handle_routes)
+    register_vertical_pack_root(Path(__file__).resolve().parent / "packs")
+    register_vertical_web_root(Path(__file__).resolve().parent / "web")

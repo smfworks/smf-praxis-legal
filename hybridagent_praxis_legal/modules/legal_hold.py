@@ -165,6 +165,10 @@ class LegalHoldLedger:
     def withdraw(self, *, hold_id: str, withdrawn_by: str,
                  reason: str, now: float | None = None) -> LegalHold:
         """Rescind a hold before acknowledgment (e.g. issued in error)."""
+        if not withdrawn_by.strip():
+            raise LegalHoldError("withdrawn_by is required")
+        if not reason.strip():
+            raise LegalHoldError("reason is required")
         hold = self._find(hold_id)
         if hold is None:
             raise LegalHoldError(f"hold {hold_id} not found")

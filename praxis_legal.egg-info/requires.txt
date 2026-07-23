@@ -1,6 +1,0 @@
-smf-praxis>=0.28.33
-
-[dev]
-pytest>=7
-ruff
-mypy

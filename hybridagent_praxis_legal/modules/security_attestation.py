@@ -205,7 +205,18 @@ def attest(state: str, controls: SecurityControls) -> SecurityAttestation:
             controls=controls,
         )
     tier = profile.data_security_tier
-    checker = _CHECKERS.get(tier, _check_breach_notification_only)
+    checker = _CHECKERS.get(tier)
+    if checker is None:
+        return SecurityAttestation(
+            jurisdiction=state.upper(), tier=tier, passed=False,
+            findings=[SecurityFinding(
+                "critical", "data_security_tier",
+                f"Unsupported data-security tier: {tier!r}.",
+                profile.data_security_citation,
+            )],
+            controls=controls,
+            profile_citation=profile.data_security_citation,
+        )
     findings = checker(controls)
     passed = not any(f.severity in ("critical", "high") for f in findings)
     return SecurityAttestation(

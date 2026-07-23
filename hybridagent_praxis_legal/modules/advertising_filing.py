@@ -27,6 +27,7 @@ Design (standalone, doesn't touch the artifacts canonical IR):
 """
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -55,7 +56,13 @@ class AdvertisingFiling:
     def is_complete(self) -> bool:
         """A filing is complete when filed + has a filing number (approved or
         at least filed with an authority-issued number)."""
-        return self.status in ("filed", "approved") and bool(self.filing_number)
+        return (
+            self.status in ("filed", "approved")
+            and bool(self.filing_number.strip())
+            and bool(self.filed_at.strip())
+            and bool(self.filed_by.strip())
+            and bool(self.authority.strip())
+        )
 
 
 @dataclass
@@ -105,7 +112,13 @@ def validate_before_send(filing: AdvertisingFiling) -> list[FilingFinding]:
 
     Returns a list of findings; empty list = OK to send.
     """
-    if not filing_required(filing.jurisdiction):
+    profile = get_legal_profile(filing.jurisdiction)
+    if profile is None:
+        return [FilingFinding(
+            "critical", "jurisdiction",
+            f"Unsupported jurisdiction: {filing.jurisdiction!r}.", "",
+        )]
+    if not profile.advertising_filing_required:
         return []  # no filing requirement in this jurisdiction
     findings: list[FilingFinding] = []
     citation = filing_citation(filing.jurisdiction)
@@ -120,7 +133,11 @@ def validate_before_send(filing: AdvertisingFiling) -> list[FilingFinding]:
             "Advertising piece is missing the mandatory disclaimers "
             "('Prior results do not guarantee a similar outcome').",
             citation))
-    if filing.status == "draft":
+    if filing.status not in {"draft", "filed", "approved", "rejected", "withdrawn"}:
+        findings.append(FilingFinding(
+            "critical", "status", f"Unknown filing status: {filing.status!r}.", citation,
+        ))
+    elif filing.status == "draft":
         findings.append(FilingFinding(
             "high", "status",
             "Filing status is 'draft' — must be filed with the authority before SEND.",
@@ -141,6 +158,14 @@ def validate_before_send(filing: AdvertisingFiling) -> list[FilingFinding]:
             "high", "status",
             "Filing was withdrawn — cannot send without a re-file.",
             citation))
+    if filing.status in {"filed", "approved"} and not filing.filed_at.strip():
+        findings.append(FilingFinding(
+            "high", "filed_at", "Filing date is required to evidence submission.", citation,
+        ))
+    if filing.status in {"filed", "approved"} and not filing.filed_by.strip():
+        findings.append(FilingFinding(
+            "high", "filed_by", "Filer identity is required to evidence submission.", citation,
+        ))
     if not filing.authority:
         findings.append(FilingFinding(
             "medium", "authority",
@@ -169,20 +194,22 @@ class FilingLedger:
     _by_artifact: dict[str, list[AdvertisingFiling]] = field(default_factory=dict)
 
     def record(self, filing: AdvertisingFiling) -> None:
-        self._by_artifact.setdefault(filing.artifact_id, []).append(filing)
+        if not filing.artifact_id.strip():
+            raise ValueError("artifact_id is required")
+        self._by_artifact.setdefault(filing.artifact_id, []).append(deepcopy(filing))
 
     def latest(self, artifact_id: str) -> AdvertisingFiling | None:
         records = self._by_artifact.get(artifact_id)
-        return records[-1] if records else None
+        return deepcopy(records[-1]) if records else None
 
     def history(self, artifact_id: str) -> list[AdvertisingFiling]:
-        return list(self._by_artifact.get(artifact_id, []))
+        return deepcopy(self._by_artifact.get(artifact_id, []))
 
     def all_filings(self) -> list[AdvertisingFiling]:
         out: list[AdvertisingFiling] = []
         for records in self._by_artifact.values():
             out.extend(records)
-        return out
+        return deepcopy(out)
 
     def filings_for_jurisdiction(self, state: str) -> list[AdvertisingFiling]:
         return [f for f in self.all_filings() if f.jurisdiction == state.upper()]

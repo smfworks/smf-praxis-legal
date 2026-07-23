@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from hybridagent.legal_hold import (
+from hybridagent_praxis_legal.modules.legal_hold import (
     LegalHoldError,
     LegalHoldLedger,
     render_matter_summary,

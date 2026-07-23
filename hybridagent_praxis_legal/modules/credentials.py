@@ -30,6 +30,7 @@ hours < required hours for the current cycle window.
 """
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass, field
 from typing import Literal
@@ -173,12 +174,26 @@ def record_hours(cred: Credential, session: CESession) -> Credential:
     """Record a CE/PDH session against the credential. Returns the credential
     (mutated in place). Does not dedupe — the firm is responsible for not
     double-counting (per the gap analysis: asserted, not verified)."""
+    if not math.isfinite(session.hours) or not math.isfinite(session.ethics_hours):
+        raise ValueError("CE hours must be finite")
     if session.hours < 0 or session.ethics_hours < 0:
         raise ValueError("CE hours cannot be negative")
     if session.ethics_hours > session.hours:
         raise ValueError("ethics_hours cannot exceed total hours")
+    try:
+        from datetime import datetime
+        datetime.fromisoformat(session.date)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("session date must be ISO-8601") from exc
     cred.sessions.append(session)
     return cred
+
+
+def _cycle_end(last, years: int):
+    try:
+        return last.replace(year=last.year + years)
+    except ValueError:
+        return last.replace(year=last.year + years, day=28)
 
 
 def compliance_status(cred: Credential, *, now: float | None = None,
@@ -191,6 +206,8 @@ def compliance_status(cred: Credential, *, now: float | None = None,
     - ce_deficient: within the cycle window but hours or ethics below required
     - no_requirement: state has no CE requirement (required_hours == 0, e.g. MA CLE)
     """
+    if cred.status != "active":
+        return "expired"
     if cred.required_hours == 0 and cred.required_ethics_hours == 0:
         return "no_requirement"
     # cycle window from last_renewed (ISO date) + renewal_cycle_years
@@ -199,18 +216,28 @@ def compliance_status(cred: Credential, *, now: float | None = None,
         last = datetime.fromisoformat(cred.last_renewed)
     except (ValueError, TypeError):
         return "ce_deficient"  # bad date → can't prove compliance
-    cycle_end = last.replace(year=last.year + cred.renewal_cycle_years)
+    cycle_end = _cycle_end(last, cred.renewal_cycle_years)
     now_dt = datetime.fromtimestamp(now if now is not None else time.time())
     if now_dt > cycle_end:
         return "expired"
+    current_sessions = []
+    for session in cred.sessions:
+        try:
+            occurred = datetime.fromisoformat(session.date)
+        except (TypeError, ValueError):
+            continue
+        if last <= occurred <= cycle_end:
+            current_sessions.append(session)
     # CE hours check
-    if cred.accumulated_hours < cred.required_hours:
+    if sum(session.hours for session in current_sessions) < cred.required_hours:
         return "ce_deficient"
-    if cred.accumulated_ethics_hours < cred.required_ethics_hours:
+    if sum(session.ethics_hours for session in current_sessions) < cred.required_ethics_hours:
         return "ce_deficient"
     # Medical CME mandatory-topic check (Gap M7): a physician is ce_deficient
     # if any state-mandated topic hasn't been completed in the cycle.
-    if cred.required_mandatory_topics and cred.missing_mandatory_topics:
+    completed_topics = {session.topic for session in current_sessions if session.topic}
+    if (cred.required_mandatory_topics and
+            any(topic not in completed_topics for topic in cred.required_mandatory_topics)):
         return "ce_deficient"
     if (cycle_end - now_dt).days <= expiring_threshold_days:
         return "expiring_soon"

@@ -17,16 +17,18 @@ This is the test that proves the pack is a 13-state pack, not a 2-state pack.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from hybridagent import config as cfg
 from hybridagent import pack
-from hybridagent.advertising_filing import (
+from hybridagent_praxis_legal.modules.advertising_filing import (
     AdvertisingFiling,
     filing_required,
     validate_before_send,
 )
-from hybridagent.credentials import (
+from hybridagent_praxis_legal.modules.credentials import (
     CESession,
     compliance_status,
     credential_for,
@@ -36,7 +38,7 @@ from hybridagent.jurisdictions import (
     get_legal_profile,
     registered_states,
 )
-from hybridagent.security_attestation import SecurityControls, attest
+from hybridagent_praxis_legal.modules.security_attestation import SecurityControls, attest
 
 
 def _home(tmp_path, monkeypatch):
@@ -190,8 +192,9 @@ def test_law_firm_pack_knowledge_covers_13_states(tmp_path, monkeypatch):
     """The knowledge base ingested into pack:law_firm references all 13
     states in the quick-reference table."""
     _home(tmp_path, monkeypatch)
-    from hybridagent.pack import bundled_packs_dir
-    kb = (bundled_packs_dir() / "law_firm" / "knowledge.md").read_text()
+    loaded = pack.load_pack("law_firm")
+    assert loaded is not None
+    kb = (Path(loaded.path) / "knowledge.md").read_text(encoding="utf-8")
     # every state code appears in the 13-state quick reference
     for state in ("FL", "GA", "SC", "TN", "VA", "WV", "MD", "PA",
                   "OH", "NJ", "NY", "CT", "MA"):
