@@ -60,7 +60,7 @@ class PrivilegeLog:
     prepared_at: str = ""
     notes: str = ""
 
-    def add(self, entry: PrivilegeEntry) -> "PrivilegeLog":
+    def add(self, entry: PrivilegeEntry) -> PrivilegeLog:
         self.entries.append(entry)
         return self
 

@@ -217,7 +217,8 @@ def compliance_status(cred: Credential, *, now: float | None = None,
     except (ValueError, TypeError):
         return "ce_deficient"  # bad date → can't prove compliance
     cycle_end = _cycle_end(last, cred.renewal_cycle_years)
-    now_dt = datetime.fromtimestamp(now if now is not None else time.time())
+    now_dt = datetime.fromtimestamp(now if now is not None else time.time(),
+                                      tz=last.tzinfo)
     if now_dt > cycle_end:
         return "expired"
     current_sessions = []

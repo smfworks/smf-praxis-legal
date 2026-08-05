@@ -33,9 +33,9 @@ from __future__ import annotations
 
 from .registration import register
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
-__all__ = ["register", "__version__"]
+__all__ = ["__version__", "register"]
 
 # Auto-register on import so ``import hybridagent_praxis_legal`` lights up
 # the vertical for the whole process lifetime.

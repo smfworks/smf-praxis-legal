@@ -16,7 +16,7 @@ dashboard route actually executes.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from hybridagent.broker import RiskClass
 from hybridagent.evals import EvalCase
@@ -29,17 +29,13 @@ from hybridagent.verticals.registry import (
     register_vertical_web_root,
 )
 
-if TYPE_CHECKING:  # pragma: no cover
-    pass
-
-
 _LEGAL_PERSONA_SPEC = VerticalSpec(
     name="legal",
     persona_keyword="legal",
     compliance_mode="enforced",
     autonomous={RiskClass.READ},
     held={RiskClass.SEND, RiskClass.DESTRUCTIVE},
-    version="0.1.1",
+    version="0.2.0",
 )
 
 _LEGAL_SPEC = VerticalSpec(
@@ -48,7 +44,7 @@ _LEGAL_SPEC = VerticalSpec(
     compliance_mode="enforced",
     autonomous={RiskClass.READ, RiskClass.DRAFT},
     held={RiskClass.SEND, RiskClass.DESTRUCTIVE},
-    version="0.1.1",
+    version="0.2.0",
 )
 
 
@@ -94,8 +90,9 @@ def _ma_wisp_case():
 
 def _conflict_case():
     def run() -> tuple[bool, str]:
-        from .modules.conflicts import ConflictChecker, ConflictHit, PartyName
         from hybridagent.workspaces import Workspace
+
+        from .modules.conflicts import ConflictChecker, ConflictHit, PartyName
 
         class _FakeDir:
             def __init__(self, matters):
@@ -124,7 +121,10 @@ def _conflict_case():
 def _cle_case():
     def run() -> tuple[bool, str]:
         from .modules.credentials import (
-            CESession, compliance_status, credential_for, record_hours,
+            CESession,
+            compliance_status,
+            credential_for,
+            record_hours,
         )
         ny = credential_for("u", "attorney", "NY", "1", "2026-01-01")
         assert ny is not None, "NY attorney profile must exist"

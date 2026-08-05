@@ -73,7 +73,7 @@ class SecurityAttestation:
     tier: str                 # wisp_mandate | shield_obligation | breach_notification_only
     passed: bool
     findings: list[SecurityFinding] = field(default_factory=list)
-    controls: "SecurityControls | None" = None
+    controls: SecurityControls | None = None
     profile_citation: str = ""
 
     def summary(self) -> str:

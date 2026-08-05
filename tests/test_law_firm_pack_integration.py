@@ -20,9 +20,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from hybridagent import config as cfg
 from hybridagent import pack
+from hybridagent.jurisdictions import (
+    get_legal_profile,
+    registered_states,
+)
+
 from hybridagent_praxis_legal.modules.advertising_filing import (
     AdvertisingFiling,
     filing_required,
@@ -34,11 +38,10 @@ from hybridagent_praxis_legal.modules.credentials import (
     credential_for,
     record_hours,
 )
-from hybridagent.jurisdictions import (
-    get_legal_profile,
-    registered_states,
+from hybridagent_praxis_legal.modules.security_attestation import (
+    SecurityControls,
+    attest,
 )
-from hybridagent_praxis_legal.modules.security_attestation import SecurityControls, attest
 
 
 def _home(tmp_path, monkeypatch):
