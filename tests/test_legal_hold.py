@@ -35,8 +35,8 @@ def test_issue_creates_active_hold():
 ])
 def test_issue_requires_all_fields(missing):
     ledger = LegalHoldLedger()
-    kwargs = dict(matter_id="ws-1", issued_by="atty-1", custodian="c-1",  # noqa: C408
-                  scope="scope", reason="reason")
+    kwargs = {"matter_id": "ws-1", "issued_by": "atty-1", "custodian": "c-1",
+                  "scope": "scope", "reason": "reason"}
     kwargs[missing] = "  "  # whitespace-only should fail too
     with pytest.raises(LegalHoldError, match=missing):
         ledger.issue(**kwargs)

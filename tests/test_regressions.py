@@ -1,5 +1,5 @@
 """Regression coverage for release-blocking legal compliance failures."""
-from datetime import datetime, timezone
+from datetime import datetime
 from types import SimpleNamespace
 
 import pytest
@@ -22,17 +22,17 @@ from hybridagent_praxis_legal.modules.legal_hold import LegalHoldError, LegalHol
 
 
 def _approved(**changes):
-    values = dict(  # noqa: C408
-        artifact_id="ad-1",
-        jurisdiction="NY",
-        status="approved",
-        filed_at="2026-07-01",
-        filing_number="NY-1",
-        filed_by="attorney-1",
-        authority="NY Appellate Division",
-        disclaimers_present=True,
-        label_present=True,
-    )
+    values = {
+        "artifact_id": "ad-1",
+        "jurisdiction": "NY",
+        "status": "approved",
+        "filed_at": "2026-07-01",
+        "filing_number": "NY-1",
+        "filed_by": "attorney-1",
+        "authority": "NY Appellate Division",
+        "disclaimers_present": True,
+        "label_present": True,
+    }
     values.update(changes)
     return AdvertisingFiling(**values)
 
@@ -69,7 +69,7 @@ def test_lapsed_and_prior_cycle_credentials_never_report_current():
     ny = credential_for("u", "attorney", "NY", "2", "2025-01-01")
     assert ny is not None
     record_hours(ny, CESession("2020-01-01", ny.required_hours, ny.required_ethics_hours))
-    assert compliance_status(ny, now=datetime(2026, 1, 1, tzinfo=timezone.utc).timestamp()) == "ce_deficient"
+    assert compliance_status(ny, now=datetime(2026, 1, 1).timestamp()) == "ce_deficient"
 
 
 def test_leap_day_cycle_end_is_deterministic():
@@ -85,7 +85,7 @@ def test_leap_day_cycle_end_is_deterministic():
     )
     record_hours(credential, CESession("2024-03-01", 1))
     assert compliance_status(
-        credential, now=datetime(2025, 1, 1, tzinfo=timezone.utc).timestamp()
+        credential, now=datetime(2025, 1, 1).timestamp()
     ) == "current"
 
 
