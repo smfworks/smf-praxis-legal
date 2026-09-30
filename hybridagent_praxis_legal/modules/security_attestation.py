@@ -1,4 +1,4 @@
-"""Data-security attestation surface (Gap 3 — MA 201 CMR 17.00 / NY SHIELD).
+"""Data-security attestation surface (MA 201 CMR 17.00 / NY SHIELD).
 
 The existing ``compliance.py`` attests to *governance broker* decisions
 (SEND/DESTRUCTIVE approvals). This module attests to a different thing:
@@ -12,8 +12,8 @@ physical safeguards). The rest of the 13 are breach-notification-only.
 Design:
 - A ``SecurityControls`` dataclass captures declarative control state
   (WISP on file? encryption-at-rest configured? training current? etc.).
-  The firm asserts this; Praxis doesn't verify it externally (the gap analysis
-  explicitly rules out board-API integrations).
+  The firm asserts this; Praxis doesn't verify it externally (no board or
+  API verification).
 - ``attest(state)`` returns a ``SecurityAttestation`` with findings + pass/fail
   against the active jurisdiction's requirements. Per-jurisdiction: MA demands
   the full WISP+encryption+training set; NY SHIELD demands reasonable
@@ -41,7 +41,7 @@ class SecurityControls:
     """Declarative data-security control state asserted by the firm.
 
     Praxis records this; the firm is responsible for the underlying truth
-    (per the gap analysis — no board/API verification). A field set to False
+    (no board or API verification). A field set to False
     or empty is a gap that surfaces as a finding in the attestation.
     """
     wisp_on_file: bool = False             # Written Information Security Program exists

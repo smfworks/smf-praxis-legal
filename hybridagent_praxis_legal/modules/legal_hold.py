@@ -1,9 +1,10 @@
-"""Matter-wide legal-hold workflow (Gap 6 — custodian acknowledgment + release).
+"""Matter-wide legal-hold workflow (custodian acknowledgment + release).
 
 The existing ``data_policy.py`` has the per-record ``legal_hold=True`` primitive
 (passed to ``disposition()`` → returns "hold" → ``authorize_delete()`` raises).
 And ``WorkspaceDirectory.set_hold`` sets the workspace-level hold flag. What
-was missing — per the 13-state gap analysis — is the *workflow* on top:
+this module adds, covering litigation-hold practice across the 13 states, is
+the *workflow* on top:
 
   * a matter-wide hold *issuance* (record who issued it, why, scope, custodian);
   * a custodian-*acknowledgment* step (the custodian confirms they've preserved);

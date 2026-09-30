@@ -1,4 +1,4 @@
-"""Attorney-advertising filing workflow (Gap 2 — NY 22 NYCRR 1200, + FL).
+"""Attorney-advertising filing workflow (NY 22 NYCRR 1200, + FL).
 
 NY and FL are the only two states in the 13 that require attorney-advertising
 *filing* — NY with the Appellate Division's Attorney Advertising Registration
@@ -9,15 +9,14 @@ Praxis already routes ad copy as DRAFT → attorney approval before SEND (the
 governance-broker SEND-risk hold). That's the right *governance* posture. This
 module adds the *filing-tracking* workflow: record the filing date, filing/
 approval number, disclaimer inclusion, and label — so a NY or FL law firm can
-evidence compliance. Per the gap analysis: "an advertising-filing tracker on
-top of the artifacts module... require filing-metadata fields before SEND
-approval. Configurable per jurisdiction."
+evidence compliance. Filing-metadata fields are required before SEND
+approval, and the requirement is configurable per jurisdiction.
 
 Design (standalone, doesn't touch the artifacts canonical IR):
 - ``AdvertisingFiling`` — the filing record (artifact_id, jurisdiction, status,
   filed_at, filing_number, disclaimers_present, label_present, filed_by,
   authority, notes). Statuses: draft → filed → approved | rejected | withdrawn.
-- ``filing_required(state)`` — consults the Gap 1 registry
+- ``filing_required(state)`` — consults the jurisdiction registry
   (LegalProfile.advertising_filing_required). Only NY + FL return True.
 - ``validate_before_send(filing)`` — for NY/FL, requires label + disclaimers +
   a non-empty filing number before the SEND approval can proceed. Returns a
@@ -74,7 +73,7 @@ class FilingFinding:
 
 
 # ---------------------------------------------------------------------------
-# Filing-required lookup — delegates to the Gap 1 registry
+# Filing-required lookup — delegates to the jurisdiction registry
 
 def filing_required(state: str) -> bool:
     """True if the jurisdiction requires attorney-advertising filing.
