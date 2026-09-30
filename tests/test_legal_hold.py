@@ -1,4 +1,4 @@
-"""Matter-wide legal-hold workflow tests (Gap 6).
+"""Matter-wide legal-hold workflow tests.
 
 The ledger wraps the existing per-record legal_hold=True primitive +
 WorkspaceDirectory.set_hold with the issuance → acknowledgment → release

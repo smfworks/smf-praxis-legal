@@ -1,16 +1,16 @@
-"""Professional credential + continuing-education tracking (Gap 4).
+"""Professional credential + continuing-education tracking.
 
-Per the 13-state gap analysis: 12 of 13 states require CLE for attorneys (MA
-is the only exception); all 13 require PDH for PEs. A firm using Praxis can't
-evidence that its professionals maintain licensure without a credential
-tracker. This module is that tracker — per-user professional-license registry
-with CE/PDH hour accumulation, ethics-hour tracking, renewal-cycle management,
-and per-state configurable requirements sourced from the Gap 1 registry.
+Covers 13 state professional-licensure rules: 12 of 13 states require CLE for
+attorneys (MA is the only exception); all 13 require PDH for PEs. A firm using
+Praxis can't evidence that its professionals maintain licensure without a
+credential tracker. This module is that tracker — per-user professional-license
+registry with CE/PDH hour accumulation, ethics-hour tracking, renewal-cycle
+management, and per-state configurable requirements sourced from the
+jurisdiction registry.
 
-Per the gap analysis: Praxis tracks the *asserted* credential; the firm is
-responsible for verification (no board-API integrations — the boards don't
-all expose them, and Praxis is a knowledge platform, not a verification
-authority).
+Praxis tracks the *asserted* credential; the firm is responsible for
+verification (no board-API integrations — the boards don't all expose them,
+and Praxis is a knowledge platform, not a verification authority).
 
 Design:
 - ``Credential`` — a professional license (user_id, profession (attorney|pe),
@@ -105,9 +105,10 @@ class Credential:
 def credential_for(user_id: str, profession: Profession, state: str,
                    license_number: str, last_renewed: str,
                    ) -> Credential | None:
-    """Build a Credential with per-state requirements sourced from the Gap 1
-    registry. Returns None if the state isn't in the registry or the profession
-    isn't applicable (e.g. attorney profile for a state with no LegalProfile)."""
+    """Build a Credential with per-state requirements sourced from the
+    jurisdiction registry. Returns None if the state isn't in the registry or
+    the profession isn't applicable (e.g. attorney profile for a state with no
+    LegalProfile)."""
     state = state.lower()
     if profession == "attorney":
         lp = get_legal_profile(state)
@@ -173,7 +174,7 @@ def credential_for(user_id: str, profession: Profession, state: str,
 def record_hours(cred: Credential, session: CESession) -> Credential:
     """Record a CE/PDH session against the credential. Returns the credential
     (mutated in place). Does not dedupe — the firm is responsible for not
-    double-counting (per the gap analysis: asserted, not verified)."""
+    double-counting (asserted hours, not independently verified)."""
     if not math.isfinite(session.hours) or not math.isfinite(session.ethics_hours):
         raise ValueError("CE hours must be finite")
     if session.hours < 0 or session.ethics_hours < 0:

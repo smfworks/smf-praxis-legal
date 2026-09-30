@@ -1,18 +1,15 @@
-"""Privilege log + expert-witness disclosure templates (Gaps 7-8).
+"""Privilege log + expert-witness disclosure templates.
 
-Two low-priority artifact templates the gap analysis identified for law-firm
-vertical completeness:
-  Gap 7: privilege log — the document-by-document privilege claim (attorney-
+Two artifact templates for law-firm discovery work:
+  privilege log — the document-by-document privilege claim (attorney-
     client, work-product, etc.) required during discovery.
-  Gap 8: expert-witness disclosure — the federal Rule 26(a)(2) / state-
+  expert-witness disclosure — the federal Rule 26(a)(2) / state-
     equivalent disclosure (qualifications, prior testimony, compensation,
     basis for opinion), per-jurisdiction format.
 
-Both are standalone generators (like Gap 2's advertising-filing tracker) —
+Both are standalone generators (like the advertising-filing tracker) —
 they reference artifacts by id and don't touch the canonical IR. The firm
-fills in the content; the templates produce the standard format. Per the
-gap analysis: "useful for vertical completeness, not urgent — firms produce
-these manually today."
+fills in the content; the templates produce the standard format.
 """
 from __future__ import annotations
 
@@ -32,7 +29,7 @@ PrivilegeBasis = Literal[
 
 
 # ---------------------------------------------------------------------------
-# Gap 7 — Privilege log
+# Privilege log
 
 @dataclass(frozen=True)
 class PrivilegeEntry:
@@ -116,7 +113,7 @@ def render_privilege_log(log: PrivilegeLog) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Gap 8 — Expert-witness disclosure (Rule 26(a)(2) / state equivalent)
+# Expert-witness disclosure (Rule 26(a)(2) / state equivalent)
 
 @dataclass(frozen=True)
 class PriorTestimony:

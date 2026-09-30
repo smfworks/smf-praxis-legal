@@ -1,10 +1,10 @@
-"""Conflict-of-interest checking across matters (Gap 5).
+"""Conflict-of-interest checking across matters.
 
-The gap analysis: "party-name search across all matter workspaces (within an
-org), with a pre-engagement conflict report. This crosses the workspace-
-isolation boundary — it needs an org-level read index of party names (not
-matter content), with break-glass controls. Sensitive — must not leak
-privileged content across matters."
+Party-name search across all matter workspaces (within an org), with a
+pre-engagement conflict report. This crosses the workspace-isolation
+boundary — it needs an org-level read index of party names (not matter
+content), with break-glass controls. Sensitive — must not leak privileged
+content across matters.
 
 Design — respects the workspace-isolation boundary:
 - The conflict index reads *only* the party-name surface fields on each

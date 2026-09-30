@@ -2,7 +2,7 @@
 
 Proves the pack works across all 13 states, not just NY and MA. For each
 state, activates the pack with that jurisdiction and exercises the per-
-jurisdiction behavior sourced from the Gap 1 registry:
+jurisdiction behavior sourced from the jurisdiction registry:
 
   - ad-filing gate activates only for NY + FL (22 NYCRR 1200 / FL Bar)
   - WISP attestation tier is wisp_mandate for MA, shield_obligation for NY,
@@ -65,7 +65,7 @@ def test_law_firm_pack_activates(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("state", STATES)
 def test_every_state_has_a_legal_profile_the_pack_can_load(state):
-    """The pack's per-jurisdiction logic flows from the Gap 1 registry. Every
+    """The pack's per-jurisdiction logic flows from the jurisdiction registry. Every
     one of the 13 states must have a LEGAL profile the pack can load."""
     p = get_legal_profile(state)
     assert p is not None, f"{state} missing LEGAL profile"

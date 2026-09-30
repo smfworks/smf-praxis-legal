@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "praxis-legal"
 version = "0.2.1"
-description = "SMF Praxis Legal vertical — Law Firm compliance pack (private, commercial)"
+description = "SMF Praxis legal compliance pack"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Commercial — SMF Works. All rights reserved." }
-authors = [{ name = "SMF Works", email = "liam@smfworks.com" }]
+license = { text = "MIT" }
+authors = [{ name = "SMF Works", email = "hello@smfworks.com" }]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Legal Industry",
@@ -18,8 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: Other/Proprietary License",
-    "Private :: Do Not Upload",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "praxis-agent>=0.30.0",
